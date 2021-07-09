@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Classification</title>
+</head>
+<style>
+    .container{width: 70%;
+        margin: auto;}
+    .container form{
+        margin: auto;
+       
+        display: flex;
+        margin: auto;
+        background-color: aqua;
+        flex-direction: row;
+    }
+    .container form .text-input{
+        flex: 1;
+        margin: 0;
+    }
+    .container form .button{
+        flex: 0;
+        margin: 0;
+    }
+    table {  
+        width: 100%;
+        margin: auto;   
+        font-size: 14px;
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+    background-color: #dddddd;
+    }
+    .table-container{
+        margin-top: 20px;
+    }
+</style>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Sentiment Analysis</h1>
+    <form class="form" id="myAnchor" >
+        <textarea type="text" class="text-input" placeholder="Enter your sentence"></textarea>
+        <input id="btn" class="button" type="submit" value="Submit"/>
+    </form>
+    <div class="table-container">
+    <button id="btn-export-csv">Export To Csv</button>
+    <table id="list_sentences"></div>
+     
+</table>
+</div>
+    <script>
+        let list_sentences = document.getElementById("list_sentences")
+         str="<tr><th>Review</th><th>Probability</th><th>Sentiment</th></tr>"
+        list_sentences.innerHTML=str
+        let list = [{sentence:"Ngon quá các bạn", result:0.7}]
+       
+        let submit_btn = document.getElementById("btn")
+        const Http = new XMLHttpRequest();    
+          const exportToCsv = function() {
+            console.log("export to csv")
+            var CsvString = "Review,Probability,Sentiment,\r\n";
+            list.forEach(function(e,index) {
+                console.log(e)
+               
+                let line = e.sentence+","+(e.result+"").substr(0,4)+","+
+                    (Math.round(e.result)==1?"Positive":"Negative")
+                    +","
+                 CsvString+= line+"\r\n";
+            });
+          
+            var encodedUri ="data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURI(CsvString);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "sentiment_analysis.csv");
+            document.body.appendChild(link); // Required for FF
+            
+            link.click();
+        }
+        const delete_sentence = function(index){
+            console.log(index)
+            list.splice(index,1)
+            updateTable()
+        }
+        const updateTable = function(){
+            console.log(list)
+            str="<tr><th>Review</th><th>Probability</th><th>Sentiment</th><th>Thao tác</th></tr>"
+            list.forEach((e,index)=>{
+                str+="<tr><td>"+e.sentence+"</td><td>"+(e.result+"").substr(0,4)+"</td><td>"+
+                    (Math.round(e.result)==1?"Positive":"Negative")
+                    +"</td><td><button onclick='delete_sentence("+index+")'>Xoá</button></td></tr></tr>"
+            })
+            list_sentences.innerHTML=str
+        }
+        updateTable()
+        const onAnalysis = function(event){
+            event.preventDefault()
+            let review = event.target[0].value
+           
+            const url='/api/?sentence='+review;
+             btn.disabled = true
+               btn.value="Waiting"
+            fetch(url)
+             .then(response => response.json())
+            .then(data => {
+          
+          
+            list.push({result:data.result,sentence:review})
+            btn.value="Submit"
+            btn.disabled = false
+            updateTable()
+         
+            
+        });
+                    
+           
+        }
+        document.getElementById("myAnchor").addEventListener("submit", onAnalysis);
+        document.getElementById("btn-export-csv").addEventListener("click",exportToCsv)
+    
+    </script>
+</body>
+</html>
