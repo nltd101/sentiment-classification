@@ -11,7 +11,7 @@ import pickle
 import codecs
 from tensorflow import keras
 from keras_bert import load_trained_model_from_checkpoint
-
+from tensorflow import train
 
 SEQ_LEN = 256
 LR = 2e-5
@@ -83,10 +83,12 @@ class bert():
 
         self.model = models.Model(inputs, outputs)
 
-
-       
-        self.model.load_weights(os.path.join(
-            "weights", 'lastweight'))
+      
+        # checkpoint = train.Checkpoint(self.model)
+        # checkpoint.restore(os.path.join("weights", "lastweight"))
+        checkpoint = train.Checkpoint(self.model)
+        checkpoint.restore(os.path.join("trained_model", "bert_model.ckpt"))
+      
 
 
 
