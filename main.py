@@ -1,10 +1,14 @@
 
 from urllib.parse import urlparse, parse_qs
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import time
+
 from bert import bert
 hostName = "localhost"
-serverPort = 8080
+import sys
+try:
+    serverPort = int(sys.argv[1]) if len(sys.argv) == 2 else 8080
+except Exception as e:
+    serverPort=8080
 A = bert()
 
 class MyServer(BaseHTTPRequestHandler):

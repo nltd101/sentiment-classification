@@ -7,11 +7,9 @@ os.environ['TF_KERAS'] = '1'
 from keras_bert.layers import Extract
 import numpy as np
 from keras_bert import Tokenizer
-import pickle
 import codecs
 from tensorflow import keras
 from keras_bert import load_trained_model_from_checkpoint
-from tensorflow import train
 from os.path import join
 SEQ_LEN = 256
 LR = 2e-5
@@ -25,10 +23,10 @@ class bert():
         self.create_model()
 
     def load_data(self, data, sentiments):
-        token_dict = {}
+        
         indices = []
         for text in data:
-            ids, segments = self.tokenizer.encode(text, max_len=SEQ_LEN)
+            ids, _ = self.tokenizer.encode(text, max_len=SEQ_LEN)
             indices.append(ids)
 
         return [indices, np.zeros_like(indices)], np.array(sentiments)
@@ -52,7 +50,6 @@ class bert():
             print(vocab_path)
             for line in reader:
                 token = line.strip()
-                # the first word is the most negative
                 token_dict[token] = len(token_dict)
         self.tokenizer = Tokenizer(token_dict, cased=True)
 
@@ -73,11 +70,6 @@ class bert():
         outputs = keras.layers.Dense(units=1, activation='sigmoid')(newout)
 
         self.model = models.Model(inputs, outputs)
-        self.model.load_weights(join("last_weight", "lastweight"))
+        self.model.load_weights(join("last_weights", "lastweights"))
 
 
-# a = bert()
-# print(a.classify_sentiment("Ngon quá bạn ơi"))
-# print(a.classify_sentiment("Ngon quá bạn ơi"))
-# print(a.classify_sentiment("Dở quá, đồ ăn không ngon"))
-# print(a.classify_sentiment("Nhất quyết không ghé lại"))
