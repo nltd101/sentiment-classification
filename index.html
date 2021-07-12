@@ -61,10 +61,11 @@
 </table>
 </div>
     <script>
+    console.log=(x)=>{}
         let list_sentences = document.getElementById("list_sentences")
          str="<tr><th>Review</th><th>Probability</th><th>Sentiment</th></tr>"
         list_sentences.innerHTML=str
-        let list = [{sentence:"Ngon quá các bạn", result:0.7}]
+        let list = []
        
         let submit_btn = document.getElementById("btn")
         const Http = new XMLHttpRequest();    
@@ -114,8 +115,8 @@
             fetch(url)
              .then(response => response.json())
             .then(data => {
-          
-          
+            event.target[0].value=""
+                
             list.push({result:data.result,sentence:review})
             btn.value="Submit"
             btn.disabled = false

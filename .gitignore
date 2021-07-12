@@ -1,4 +1,6 @@
 __pycache__
 checkpoint
 trained_model
-weights
+last_weight
+env
+.vscode

@@ -1,5 +1,5 @@
 from tensorflow.keras import models
-from django.conf import settings
+
 import os
 from tensorflow.python.framework.ops import disable_eager_execution
 disable_eager_execution()
@@ -12,7 +12,7 @@ import codecs
 from tensorflow import keras
 from keras_bert import load_trained_model_from_checkpoint
 from tensorflow import train
-
+from os.path import join
 SEQ_LEN = 256
 LR = 2e-5
 
@@ -21,10 +21,10 @@ token_dict = {}
 
 class bert():
 
-    def __init__(self): 
+    def __init__(self):
         self.create_model()
 
-    def load_data(self, data, sentiments):      
+    def load_data(self, data, sentiments):
         token_dict = {}
         indices = []
         for text in data:
@@ -33,27 +33,17 @@ class bert():
 
         return [indices, np.zeros_like(indices)], np.array(sentiments)
 
-    def classify_sentiment(self, text:str)->float:
+    def classify_sentiment(self, text: str) -> float:
         """classify sentiment of a sentence
-
         Args:
             text (str): A sentence predicted
-
         Returns:
             probability[float]: positive probability of the sentence
-        """        
+        """
         print("list", text)
-        list_text=[text]
+        list_text = [text]
         sample, _ = self.load_data(list_text, [])
         return self.model.predict(sample)
-        # result = []
-        
-        # for i in range(len(list_text)):
-        #     if np.round(probability[i]) == 1:
-        #         result.append("Tích cực")
-        #     else:
-        #         result.append("Tiêu cực")
-        # return result
 
     def create_model(self):
 
@@ -68,9 +58,10 @@ class bert():
 
         self.model = load_trained_model_from_checkpoint(
             os.path.join(
-                         "trained_model", 'bert_config.json'),
+                "trained_model", 'bert_config.json'),
             os.path.join(
-                         "trained_model", 'bert_model.ckpt'),
+                "trained_model", 'bert_model.ckpt'),
+          
             trainable=True,
             seq_len=SEQ_LEN,
             output_layer_num=4
@@ -82,20 +73,11 @@ class bert():
         outputs = keras.layers.Dense(units=1, activation='sigmoid')(newout)
 
         self.model = models.Model(inputs, outputs)
-
-      
-        # checkpoint = train.Checkpoint(self.model)
-        # checkpoint.restore(os.path.join("weights", "lastweight"))
-        checkpoint = train.Checkpoint(self.model)
-        checkpoint.restore(os.path.join("trained_model", "bert_model.ckpt"))
-      
+        self.model.load_weights(join("last_weight", "lastweight"))
 
 
-
-
-
-
-
-  
-
-
+# a = bert()
+# print(a.classify_sentiment("Ngon quá bạn ơi"))
+# print(a.classify_sentiment("Ngon quá bạn ơi"))
+# print(a.classify_sentiment("Dở quá, đồ ăn không ngon"))
+# print(a.classify_sentiment("Nhất quyết không ghé lại"))

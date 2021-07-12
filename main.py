@@ -28,8 +28,7 @@ class MyServer(BaseHTTPRequestHandler):
         print(query, type(query))
         self.add_parameter("application/json")
         if ("sentence" in query):
-            # self.wfile.write(bytes("<p>Request: %s</p>" %
-            #                  query["sentence"], "utf-8"))
+          
             print(query["sentence"][0])
             self.wfile.write(
                 bytes('{"result":"'+str(A.classify_sentiment(query["sentence"][0])[0][0])+'"}', "utf-8"))
